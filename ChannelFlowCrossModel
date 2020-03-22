@@ -1,0 +1,73 @@
+#!/bin/sh
+
+sudo -s
+of7
+
+#sudo -s
+#of7
+
+cp -r /home/ehsan/Downloads/FCIC-fppm-master/ScrewFeeder/code/OF7/bioFluid /opt/openfoam7/src/thermophysicalModels/specie/equationOfState/
+
+cd /opt/openfoam7/src/thermophysicalModels/specie
+
+wclean
+
+wmake libso
+
+#rm -r /opt/openfoam7/src/thermophysicalModels/specie/equationOfState/bioFluid
+#cd /opt/openfoam7/src/thermophysicalModels/specie
+#wclean
+
+
+cp /home/ehsan/Downloads/FCIC-fppm-master/ScrewFeeder/code/OF7/rhoThermos.C /opt/openfoam7/src/thermophysicalModels/basic/rhoThermo/
+
+cd /opt/openfoam7/src/thermophysicalModels/basic
+
+wclean
+
+wmake libso
+
+#rm /opt/openfoam7/src/thermophysicalModels/basic/rhoThermo/rhoThermos.C
+#cd /opt/openfoam7/src/thermophysicalModels/basic
+#wclean
+
+exit 
+of7
+
+mkdir -p $WM_PROJECT_USER_DIR/applications/solvers
+cp -r /home/ehsan/Downloads/FCIC-fppm-master/ScrewFeeder/code/OF7/biomassFoam_Cross_density_dependent $WM_PROJECT_USER_DIR/applications/solvers/ehsan_Cross
+
+cd $WM_PROJECT_USER_DIR/applications/solvers/ehsan_Cross/Make
+
+gedit files # EXE = $(FOAM_USER_APPBIN)/ehsan_Cross
+rm -rf linuxGccDP0pt
+cd $WM_PROJECT_USER_DIR/applications/solvers/ehsan_Cross/Make
+
+wmake
+
+ls $FOAM_USER_APPBIN #will echo the name of the solver
+
+#rm -r $WM_PROJECT_USER_DIR/applications
+#rm -r $WM_PROJECT_USER_DIR/platforms
+
+cp -r /home/ehsan/Downloads/FCIC-fppm-master/ScrewFeeder/Simulation/mrahimi/Channel_flow_Duncan_solver ~/OpenFOAM/ehsan-7/run/
+
+#rm -r ~/OpenFOAM/ehsan-7/run/Channel_flow_Duncan_solver
+
+cp /home/ehsan/Downloads/FCIC-fppm-master/ScrewFeeder/code/OF7/screw_feeder_6rpm/constant/thermophysicalProperties /home/ehsan/OpenFOAM/ehsan-7/run/Channel_flow_Duncan_solver/constant
+
+cp /home/ehsan/Downloads/FCIC-fppm-master/ScrewFeeder/code/OF7/screw_feeder_6rpm/system/fvSolution /home/ehsan/OpenFOAM/ehsan-7/run/Channel_flow_Duncan_solver/system
+
+cd /home/ehsan/OpenFOAM/ehsan-7/run/Channel_flow_Duncan_solver/
+
+blockMesh
+
+decompoosePar
+
+mpirun -np 4 ehsan_Cross -parallel > log
+reconstructPar
+#ehsan_Cross > log
+
+paraFoam
+
+
